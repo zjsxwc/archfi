@@ -193,6 +193,7 @@ diskpartwizard(){
       return 1
     fi
   fi
+  txtconfirmation="System Boot Type : $systemboottype"
   
   items=$(lsblk -d -p -n -l -o NAME -e 7,11)
   options=()
@@ -205,6 +206,7 @@ diskpartwizard(){
   if [ ! "$?" = "0" ]; then
     return 1
   fi
+  txtconfirmation="$txtconfirmation\nDevice : $device"
   
   options=()
   options+=("GPT" "")
@@ -215,11 +217,13 @@ diskpartwizard(){
   if [ ! "$?" = "0" ]; then
     return 1
   fi
+  txtconfirmation="$txtconfirmation\nPartition Table : $parttabletype"
   
   bootsize=$(whiptail --backtitle "$apptitle" --title "Boot Size" --inputbox "" 0 0 "512M" 3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
     return 1
   fi
+  txtconfirmation="$txtconfirmation\nBoot Partition Size : $bootsize"
   
   if (whiptail --backtitle "$apptitle" --title "Add Swap partition" --yesno "Add Swap partition" 0 0) then
     swapsize=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
@@ -228,25 +232,32 @@ diskpartwizard(){
     if [ ! "$?" = "0" ]; then
       return 1
     fi
+    txtconfirmation="$txtconfirmation\nSwap Partition Size : $swapsize"
   else
     swapsize=0
+    txtconfirmation="$txtconfirmation\nSwap Partition : none"
   fi
   
   rootsize=$(whiptail --backtitle "$apptitle" --title "Root Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
     return 1
   fi
+  txtconfirmation="$txtconfirmation\nRoot Partition Size : $rootsize"
   
-  if (whiptail --backtitle "$apptitle" --title "Add Home partition" --yesno "Add Home partition" 0 0) then
-    homesize=$(whiptail --backtitle "$apptitle" --title "Home Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
-    if [ ! "$?" = "0" ]; then
-      return 1
+  if [ ! "$rootsize" = "Full" ]; then
+    if (whiptail --backtitle "$apptitle" --title "Add Home partition" --yesno "Add Home partition" 0 0) then
+      homesize=$(whiptail --backtitle "$apptitle" --title "Home Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
+      if [ ! "$?" = "0" ]; then
+        return 1
+      fi
+      txtconfirmation="$txtconfirmation\nHome Partition Size : $homesize"
+    else
+      homesize=0
+      txtconfirmation="$txtconfirmation\nHome Partition : none"
     fi
-  else
-    homesize=0
   fi
   
-  if (whiptail --backtitle "$apptitle" --title "Proceed ?" --yesno "System Boot Type : $systemboottype\nPartition Table : $parttabletype" 0 0) then
+  if (whiptail --backtitle "$apptitle" --title "Proceed ?" --yesno "$txtconfirmation" 0 0) then
     echo "Proceed"
   fi
 }
