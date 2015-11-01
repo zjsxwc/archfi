@@ -190,7 +190,7 @@ diskpartwizard(){
       "${options[@]}" \
       3>&1 1>&2 2>&3)
     if [ ! "$?" = "0" ]; then
-      exit 0
+      return 1
     fi
   fi
   
@@ -203,7 +203,7 @@ diskpartwizard(){
     "${options[@]}" \
     3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
-    exit 0
+    return 1
   fi
   
   options=()
@@ -213,8 +213,10 @@ diskpartwizard(){
     "${options[@]}" \
     3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
-    exit 0
+    return 1
   fi
+  
+  
   
 }
 
