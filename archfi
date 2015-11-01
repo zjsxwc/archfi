@@ -216,8 +216,39 @@ diskpartwizard(){
     return 1
   fi
   
+  bootsize=$(whiptail --backtitle "$apptitle" --title "Boot Size" --inputbox "" 0 0 "512M" 3>&1 1>&2 2>&3)
+  if [ ! "$?" = "0" ]; then
+    return 1
+  fi
   
+  if (whiptail --backtitle "$apptitle" --title "Add Swap partition" --yesno "Add Swap partition" 0 0) then
+    swapsize=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
+    swapsize=$(($swapsize/1000))"M"
+    swapsize=$(whiptail --backtitle "$apptitle" --title "Boot Size" --inputbox "" 0 0 "$swapsize" 3>&1 1>&2 2>&3)
+    if [ ! "$?" = "0" ]; then
+      return 1
+    fi
+  else
+    swapsize=0
+  fi
   
+  rootsize=$(whiptail --backtitle "$apptitle" --title "Root Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
+  if [ ! "$?" = "0" ]; then
+    return 1
+  fi
+  
+  if (whiptail --backtitle "$apptitle" --title "Add Home partition" --yesno "Add Home partition" 0 0) then
+    homesize=$(whiptail --backtitle "$apptitle" --title "Home Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
+    if [ ! "$?" = "0" ]; then
+      return 1
+    fi
+  else
+    homesize=0
+  fi
+  
+  if (whiptail --backtitle "$apptitle" --title "Proceed ?" --yesno "System Boot Type : $systemboottype\nPartition Table : $parttabletype" 0 0) then
+    echo "Proceed"
+  fi
 }
 
 
