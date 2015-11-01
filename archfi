@@ -186,7 +186,7 @@ diskpartwizard(){
     options+=("EFI/UEFI" "")
     options+=("BIOS" "")
     options+=("Hybrid" "")
-    systemboottype=$(whiptail --backtitle "$apptitle" --title "System Boot Type" --menu "" 0 0 0 \
+    systemboottype=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --menu "System Boot Type" 0 0 0 \
       "${options[@]}" \
       3>&1 1>&2 2>&3)
     if [ ! "$?" = "0" ]; then
@@ -200,7 +200,7 @@ diskpartwizard(){
   for item in $items; do
     options+=("$item" "")
   done
-  device=$(whiptail --backtitle "$apptitle" --title "Select device" --menu "" 0 0 0 \
+  device=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --menu "Select device" 0 0 0 \
     "${options[@]}" \
     3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
@@ -211,7 +211,7 @@ diskpartwizard(){
   options=()
   options+=("GPT" "")
   options+=("DOS" "")
-  parttabletype=$(whiptail --backtitle "$apptitle" --title "Partition Table Type" --menu "" 0 0 0 \
+  parttabletype=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --menu "Partition Table Type" 0 0 0 \
     "${options[@]}" \
     3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
@@ -219,16 +219,16 @@ diskpartwizard(){
   fi
   txtconfirmation="$txtconfirmation\nPartition Table : $parttabletype"
   
-  bootsize=$(whiptail --backtitle "$apptitle" --title "Boot Size" --inputbox "" 0 0 "512M" 3>&1 1>&2 2>&3)
+  bootsize=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --inputbox "Boot Size" 0 0 "512M" 3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
     return 1
   fi
   txtconfirmation="$txtconfirmation\nBoot Partition Size : $bootsize"
   
-  if (whiptail --backtitle "$apptitle" --title "Add Swap partition" --yesno "Add Swap partition" 0 0) then
+  if (whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --yesno "Add Swap partition" 0 0) then
     swapsize=$(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }')
     swapsize=$(($swapsize/1000))"M"
-    swapsize=$(whiptail --backtitle "$apptitle" --title "Boot Size" --inputbox "" 0 0 "$swapsize" 3>&1 1>&2 2>&3)
+    swapsize=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --inputbox "Boot Size" 0 0 "$swapsize" 3>&1 1>&2 2>&3)
     if [ ! "$?" = "0" ]; then
       return 1
     fi
@@ -238,15 +238,15 @@ diskpartwizard(){
     txtconfirmation="$txtconfirmation\nSwap Partition : none"
   fi
   
-  rootsize=$(whiptail --backtitle "$apptitle" --title "Root Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
+  rootsize=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --inputbox "Root Size" 0 0 "Full" 3>&1 1>&2 2>&3)
   if [ ! "$?" = "0" ]; then
     return 1
   fi
   txtconfirmation="$txtconfirmation\nRoot Partition Size : $rootsize"
   
   if [ ! "$rootsize" = "Full" ]; then
-    if (whiptail --backtitle "$apptitle" --title "Add Home partition" --yesno "Add Home partition" 0 0) then
-      homesize=$(whiptail --backtitle "$apptitle" --title "Home Size" --inputbox "" 0 0 "Full" 3>&1 1>&2 2>&3)
+    if (whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --yesno "Add Home partition" 0 0) then
+      homesize=$(whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --inputbox "Home Size" 0 0 "Full" 3>&1 1>&2 2>&3)
       if [ ! "$?" = "0" ]; then
         return 1
       fi
@@ -255,9 +255,14 @@ diskpartwizard(){
       homesize=0
       txtconfirmation="$txtconfirmation\nHome Partition : none"
     fi
+  else
+      homesize=0
+      txtconfirmation="$txtconfirmation\nHome Partition : none"
   fi
   
-  if (whiptail --backtitle "$apptitle" --title "Proceed ?" --yesno "$txtconfirmation" 0 0) then
+  $txtconfirmation="$txtconfirmation\n\nThe next operation will errase and partition your hard drive."
+  $txtconfirmation="$txtconfirmation\n\nProceed ?"
+  if (whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --yesno "$txtconfirmation" 0 0) then
     echo "Proceed"
   fi
 }
