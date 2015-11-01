@@ -128,6 +128,7 @@ diskpartmenu(){
     nextitem=$1
   fi
   options=()
+  options+=("$txtautoparts (wizard)" "")
   if [ "$eficomputer" == "0" ]; then
     options+=("$txtautoparts (gpt)" "")
     options+=("$txtautoparts (dos)" "")
@@ -144,6 +145,10 @@ diskpartmenu(){
     3>&1 1>&2 2>&3)
   if [ "$?" = "0" ]; then
     case $sel in
+      "$txtautoparts (wizard)")
+        diskpartwizard
+        nextitem="$txtautoparts (wizard)"
+      ;;
       "$txtautoparts (dos)")
         diskpartautodos
         nextitem="$txtautoparts (dos)"
@@ -171,6 +176,46 @@ diskpartmenu(){
     esac
     diskpartmenu "$nextitem"
   fi
+}
+
+
+diskpartwizard(){
+  systemboottype="BIOS"
+  if [ "$eficomputer" == "1" ]; then
+    options=()
+    options+=("EFI/UEFI" "")
+    options+=("BIOS" "")
+    options+=("Hybrid" "")
+    systemboottype=$(whiptail --backtitle "$apptitle" --title "System Boot Type" --menu "" 0 0 0 \
+      "${options[@]}" \
+      3>&1 1>&2 2>&3)
+    if [ ! "$?" = "0" ]; then
+      exit 0
+    fi
+  fi
+  
+  items=$(lsblk -d -p -n -l -o NAME -e 7,11)
+  options=()
+  for item in $items; do
+    options+=("$item" "")
+  done
+  device=$(whiptail --backtitle "$apptitle" --title "Select device" --menu "" 0 0 0 \
+    "${options[@]}" \
+    3>&1 1>&2 2>&3)
+  if [ ! "$?" = "0" ]; then
+    exit 0
+  fi
+  
+  options=()
+  options+=("GPT" "")
+  options+=("DOS" "")
+  parttabletype=$(whiptail --backtitle "$apptitle" --title "Partition Table Type" --menu "" 0 0 0 \
+    "${options[@]}" \
+    3>&1 1>&2 2>&3)
+  if [ ! "$?" = "0" ]; then
+    exit 0
+  fi
+  
 }
 
 
