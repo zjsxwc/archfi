@@ -262,7 +262,7 @@ diskpartwizard(){
   
   $txtconfirmation="$txtconfirmation\n\nThe next operation will errase and partition your hard drive."
   $txtconfirmation="$txtconfirmation\n\nProceed ?"
-  if (whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --yesno "$txtconfirmation" 0 0) then
+  if (whiptail --backtitle "$apptitle" --title "$txtautoparts (wizard)" --yesno "$txtconfirmation" --defaultno 0 0) then
     echo "Proceed"
   fi
 }
