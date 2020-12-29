@@ -28,6 +28,14 @@ Finally, launch the script:
 
     sh archfi
 
+
+```
+sda1 boot
+sda3 swap
+sda2 root
+sda4 home
+```
+
 Then follow the on-screen instructions to completion.
 
 If you require extra help, visit the provided video playlist and follow my example.
